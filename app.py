@@ -14,34 +14,28 @@ from sql_helper import SQLHelper
 DB_PATH = 'sqlite:///Resources/hawaii.sqlite'
 
 
-# #################################################
-# # Database Setup
-# #################################################
-# # Create engine using the `hawaii.sqlite` database file
-# engine = create_engine(DB_PATH)
-# Base = automap_base()
-# Base.prepare(engine, reflect=True)
-# measurement = Base.classes.measurement
-# station = Base.classes.station
-# session = Session(engine)
-
 #################################################
 # Flask Setup
 #################################################
 app = Flask(__name__)
 sqlHelper = SQLHelper(DB_PATH)
+
 #################################################
-# Flask Routes
+# Flask HTML Routes
 #################################################
 @app.route("/")
 def home():
-    return """/api/v1.0/precipitation 
-                /api/v1.0/stations
-                /api/v1.0/tobs
-                /api/v1.0/temp/<start>
-                /api/v1.0/temp/<start>/<end>
+    return """/api/v1.0/precipitation<br>
+                /api/v1.0/stations<br>
+                /api/v1.0/tobs<br>
+                /api/v1.0/temp/&lt;start&gt;<br>
+                /api/v1.0/temp/&lt;start&gt;/&lt;end&gt;<br>
             """ 
 
+
+#################################################
+# Flask API Routes
+#################################################
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     # Execute Query
@@ -63,13 +57,13 @@ def stations():
 @app.route("/api/v1.0/tobs")
 def temperature():
     # Execute Query
-    df = sqlHelper.queryTempSQL()
+    df = sqlHelper.queryTemperatureSQL()
 
     # Turn DataFrame into List of Dictionary
     data = df.to_dict(orient="records")
     return jsonify(data)
 
-@app.route("/api/v1.0/<start>")
+@app.route("/api/v1.0/temp/<start>/")
 def tstats1(start):
     # Execute Query
     df = sqlHelper.queryTStatsSQL(start)
@@ -78,15 +72,19 @@ def tstats1(start):
     data = df.to_dict(orient="records")
     return jsonify(data)
 
-@app.route("/api/v1.0/<start>/<end>")
+@app.route("/api/v1.0/temp/<start>/<end>/")
 def tstats_se1(start, end):
     # Execute Query
-    df = sqlHelper.queryTstats_SESQL(start, end)
+    df = sqlHelper.queryTStats_StartEndSQL(start, end)
 
     # Turn DataFrame into List of Dictionary
     data = df.to_dict(orient="records")
     return jsonify(data)
 
+
+#################################################
+# Run Flask APP/Server
+#################################################
 if __name__ == '__main__':
     app.run(debug=True)
 
